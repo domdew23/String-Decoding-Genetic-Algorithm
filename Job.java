@@ -32,8 +32,7 @@ public class Job extends Thread {
 				running = false;
 				System.exit(0);
 			} else {
-				createMatingPool(getOldGeneration());
-				reset();
+				reset(createMatingPool(getOldGeneration()));
 			}
 			synchPoint.arriveAndAwaitAdvance();
 		}
@@ -92,9 +91,9 @@ public class Job extends Thread {
 		return best;
 	}
 
-	private void reset(){
+	private void reset(Person[] newPopulation){
 		for (int i = 0; i < workers.length; i++){
-			workers[i].setPopulation(nextGeneration[i]);
+			workers[i].setPopulation(newPopulation);
 		}
 	}
 
@@ -109,21 +108,16 @@ public class Job extends Thread {
 		return oldPopulation;
 	}
 
-	private void createMatingPool(Person[] oldPopulation){
+	private Person[] createMatingPool(Person[] oldPopulation){
 		Random r = new Random();
-		//System.out.println("Old Population:\n");
-		for (int i = 0; i < Settings.THREADS; i++){
-			Person[] newPopulation = new Person[Settings.POP_SIZE];
-			for (int j = 0; j < Settings.POP_SIZE; j++){
-				
-				Person one = oldPopulation[r.nextInt(10)];
-				Person two = oldPopulation[r.nextInt(10)];
-				
-				//System.out.println("one: " + one + " | two: " + two);
-				newPopulation[j] = combine(one, two);
-				//System.out.println(oldPopulation[j]);
-			}
-			nextGeneration[i] = newPopulation;
+		//System.out.println("New Population:\n");
+		Person[] newPopulation = new Person[Settings.POP_SIZE];
+		for (int j = 0; j < Settings.POP_SIZE; j++){
+			Person one = oldPopulation[r.nextInt(10)];
+			Person two = oldPopulation[r.nextInt(10)];
+			newPopulation[j] = combine(one, two);
+			//System.out.println(newPopulation[j]);
 		}
+		return newPopulation;
 	}
 }

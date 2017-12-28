@@ -7,6 +7,7 @@ public class Worker extends Thread {
 	public Person bestMember;
 	private Phaser synchPoint;
 	private boolean running;
+	private ThreadLocal<Person[]> p;
 
 	public Worker(Person[] initPopulation, Phaser synchPoint){
 		this.population = initPopulation;

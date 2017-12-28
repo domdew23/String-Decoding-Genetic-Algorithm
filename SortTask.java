@@ -26,6 +26,7 @@ public class SortTask extends RecursiveAction {
 	}
 
 	private void merge(int lo, int mid, int hi){
+		/* copy your section into "mergedArray" */
 		for (int i = lo; i < hi; i++){
 			mergedArrary[i] = array[i];
 		}

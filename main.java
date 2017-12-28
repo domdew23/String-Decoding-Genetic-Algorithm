@@ -5,6 +5,18 @@ public class main {
 		Person[] population = initPopulation();
 		Job job = new Job(population);
 		job.start();
+
+		Person best = new Person();
+		Person oldBest = new Person();
+
+		while (best.fitness != 100){
+			best = job.population[0];
+			if (!(best.dna.equals(oldBest.dna)) && best.fitness > oldBest.fitness){
+				System.out.println("Best: " + best);
+			}
+			oldBest = best;
+		}
+		System.exit(0);
 	}
 
 	private static Person[] initPopulation(){

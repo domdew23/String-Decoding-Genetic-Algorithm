@@ -1,5 +1,5 @@
 import java.util.Random;
-
+import java.util.Arrays;
 public class main {
 	public static void main(String[] args){
 		Person[] population = initPopulation();
@@ -19,7 +19,7 @@ public class main {
 				dna += Settings.CHARS.charAt(index);
 			}
 			Person p = new Person(dna);
-			population[i] = p;	
+			population[i] = p;
 		}
 		return population;		
 	}

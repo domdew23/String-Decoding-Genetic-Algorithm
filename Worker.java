@@ -1,37 +1,37 @@
-import java.util.concurrent.Phaser;
-import java.util.Arrays;
+import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class Worker extends Thread {
+public class Worker extends RecursiveAction {
 	public Person[] population;
-	public Person[] topMembers;
-	public Person bestMember;
-	private Phaser synchPoint;
-	private boolean running;
-	private ThreadLocal<Person[]> p;
+	private int lo,hi;
+	public boolean evaluate;
 
-	public Worker(Person[] initPopulation, Phaser synchPoint){
-		this.population = initPopulation;
-		this.topMembers = new Person[population.length/Settings.THREADS];
-		this.running = true;
-		this.bestMember = new Person();
-		this.synchPoint = synchPoint;
+	public Worker(Person[] population, int lo, int hi, boolean evaluate){
+		this.population = population;
+		this.lo = lo;
+		this.hi = hi;
+		this.evaluate = evaluate;
 	}
 
-	public void run(){
-		synchPoint.register();
-		while (running){
-			evaluateFitness();
-			setBest();
-			//System.out.println(Thread.currentThread().getName() + " | " + bestMember);
-			createMatingPool();
-			synchPoint.arriveAndAwaitAdvance();
+	public void compute(){
+		if ((hi - lo) <= Settings.THRESHOLD){
+			if (evaluate){
+				evaluateFitness();
+			} else {
+				createMatingPool();	
+			}
+		} else {
+			int mid = (hi + lo) / 2;
+			Worker left = new Worker(population, lo, mid, evaluate);
+			Worker right = new Worker(population, mid, hi, evaluate);
+			invokeAll(left, right);
 		}
 	}
 
 	private void evaluateFitness(){
 		int fitness;
 		int count;
-		for (int i = 0; i < Settings.POP_SIZE; i++){
+		for (int i = lo; i < hi; i++){
 			count = 0;
 			fitness = 0;
 			for (int j = 0; j < Settings.GOAL_SIZE; j++){
@@ -41,34 +41,52 @@ public class Worker extends Thread {
 			}
 			double f = ((double)count/(double)Settings.GOAL_SIZE);
 			fitness = (int) Math.round(f * 100);
-			population[i].set_fitness(fitness);
+			population[i].setFitness(fitness);
 		}
-		Arrays.sort(population);
-	}
-
-	private void setBest(){
-		if (population[0].fitness > bestMember.fitness){
-			bestMember = population[0];
-		}
-		//System.out.println(Thread.currentThread().getName() + "\n");
-		for (int i = 0; i < population.length; i++){
-			//System.out.println(population[i]);
-		}
-		//System.out.println();
 	}
 
 	private void createMatingPool(){
-		/* grabs top members of this workers population and get them ready to be added
-		for the new population for the next generation */
-		//System.out.println("Top Members:\n");
-		for (int i = 0; i < population.length/Settings.THREADS; i++){
-			topMembers[i] = population[i]; 
-			//System.out.println(topMembers[i]);
+		for (int i = lo; i < hi; i++){
+			Person one = population[ThreadLocalRandom.current().nextInt(lo, hi)];
+			Person two = population[ThreadLocalRandom.current().nextInt(lo, hi)];
+			
+			population[i] = combine(one, two);
 		}
-		//System.out.println();
 	}
 
-	public void setPopulation(Person[] population){
-		this.population = population;
+	private Person combine(Person one, Person two){
+		Person child;
+		String dna = "";
+
+		for (int i = 0; i < Settings.GOAL_SIZE; i++){
+			if (i % 2 == 0){
+				dna += one.dna.charAt(i);
+			} else {
+				dna += two.dna.charAt(i);
+			}
+		}
+
+		child = new Person(dna);
+		child.fitness = 0;
+		child.dna = mutate(child.dna);
+		return child;
+	}
+
+	private static String mutate(String dna){
+		char[] tmpDna = dna.toCharArray();
+		for (int i = 0; i < Settings.GOAL_SIZE; i++){
+			if (ThreadLocalRandom.current().nextDouble(0,1) <= Settings.MUTATION_RATE){
+				char c = Settings.CHARS.charAt(ThreadLocalRandom.current().nextInt(0, Settings.CHARS.length()));
+				tmpDna[i] = c; 
+			}
+		}
+		String mutated = new String(tmpDna);
+		return mutated;
+	}
+
+	private void printArray(Person[] array){
+		for (int i = 0; i < array.length; i++){
+			System.out.println(array[i]);
+		}
 	}
 }

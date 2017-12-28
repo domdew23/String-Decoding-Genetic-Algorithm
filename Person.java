@@ -12,7 +12,7 @@ class Person implements Comparable<Person> {
 		this.fitness = 0;
 	}
 
-	public void set_fitness(int fitness){
+	public void setFitness(int fitness){
 		this.fitness = fitness;
 	}
 

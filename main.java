@@ -2,21 +2,14 @@ import java.util.Random;
 import java.util.Arrays;
 public class main {
 	public static void main(String[] args){
-		Person[] population = initPopulation();
-		Job job = new Job(population);
+
+		Job job = new Job(initPopulation());
+		long start = System.currentTimeMillis();
 		job.start();
-
-		Person best = new Person();
-		Person oldBest = new Person();
-
-		while (best.fitness != 100){
-			best = job.population[0];
-			if (!(best.dna.equals(oldBest.dna)) && best.fitness > oldBest.fitness){
-				System.out.println("Best: " + best);
-			}
-			oldBest = best;
-		}
-		System.exit(0);
+		try { job.join(); } catch (InterruptedException e){}
+		
+		long end = System.currentTimeMillis();
+		System.out.println("Time taken: {" + ((end - start)) + "} miliseconds");
 	}
 
 	private static Person[] initPopulation(){

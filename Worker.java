@@ -2,7 +2,7 @@ import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Worker extends RecursiveAction {
-	public Person[] population;
+	private Person[] population;
 	private int lo,hi;
 	public boolean evaluate;
 
@@ -41,7 +41,7 @@ public class Worker extends RecursiveAction {
 			}
 			double f = ((double)count/(double)Settings.GOAL_SIZE);
 			fitness = (int) Math.round(f * 100);
-			population[i].setFitness(fitness);
+			population[i].fitness = fitness;
 		}
 	}
 
@@ -82,11 +82,5 @@ public class Worker extends RecursiveAction {
 		}
 		String mutated = new String(tmpDna);
 		return mutated;
-	}
-
-	private void printArray(Person[] array){
-		for (int i = 0; i < array.length; i++){
-			System.out.println(array[i]);
-		}
 	}
 }

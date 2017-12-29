@@ -1,19 +1,15 @@
-class Person implements Comparable<Person> {
+public class Person implements Comparable<Person> {
 
 	String dna;
 	int fitness;
 	
-	Person(String dna){
+	public Person(String dna){
 		this.dna = dna;
 	}
 
-	Person (){
+	public Person(){
 		this.dna = "";
 		this.fitness = 0;
-	}
-
-	public void setFitness(int fitness){
-		this.fitness = fitness;
 	}
 
 	public int compareTo(Person other){
